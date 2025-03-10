@@ -735,6 +735,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
         # keep track of the beginning and ending indices of each feature set
         cdef intp_t idx
         cdef intp_t ifeature = 0
+        cdef vector[intp_t] indices_to_sample
         cdef intp_t grid_size
 
         cdef intp_t max_features
@@ -773,7 +774,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                     feat_i = self.multi_indices_to_sample[idx][ifeature]
 
                     # here, axis-aligned splits are entirely weights of 1
-                    weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
+                    weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
                     proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
                     proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
@@ -803,11 +804,12 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                             self.multi_indices_to_sample[idx][j], self.multi_indices_to_sample[idx][i]
 
                     for ifeature in range(max_features):
+
                         # sample random feature in this set
                         feat_i = self.multi_indices_to_sample[idx][ifeature]
 
                         # here, axis-aligned splits are entirely weights of 1
-                        weight = 1  # if (rand_int(0, 2, random_state) == 1) else -1
+                        weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
                         proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
                         proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
