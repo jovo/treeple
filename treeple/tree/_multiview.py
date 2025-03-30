@@ -33,7 +33,8 @@ CRITERIA_REG = {
 }
 
 DENSE_SPLITTERS = {
-    "best": _oblique_splitter.MultiViewSplitter,
+    # "best": _oblique_splitter.MultiViewSplitter,
+    "best": _oblique_splitter.MultiViewObliqueSplitter
 }
 
 
@@ -498,6 +499,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,
+                True
+                # False
             )
 
         self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)

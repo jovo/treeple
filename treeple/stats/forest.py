@@ -275,7 +275,7 @@ def build_oob_forest(
         out of bag samples.
     """
     assert est.bootstrap
-    assert type_of_target(y) in ("binary")
+    # assert type_of_target(y) in ("binary")
     est = clone(est)
 
     # build forest
