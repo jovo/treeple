@@ -505,7 +505,7 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,
-                True
+                True,
                 # False
             )
 
