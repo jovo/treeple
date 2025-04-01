@@ -999,7 +999,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
             for idx in range(self.n_feature_sets):
                 feature_set_end = self.feature_set_ends[idx]
                 n_features_in_set = feature_set_end - feature_set_begin
-                n_non_zeros_per_set = max(<intp_t>(self.max_features_per_set[idx] * feature_combinations),1)
+                n_non_zeros_per_set = max(<intp_t>(self.max_features_per_set[idx] * feature_combinations), 1)
 
                 # indices to sample is a 1D-index array of size (max_features * n_features_in_set)
                 # which is Fisher-Yates shuffled to sample random features in each feature set
