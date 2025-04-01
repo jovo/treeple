@@ -878,6 +878,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
 
         cdef intp_t i_feature = 0
         cdef intp_t feature_set_begin = 0
+        cdef intp_t feature_sets_before = 0
         cdef intp_t size_of_feature_set
         cdef intp_t ifeat = 0
         cdef intp_t iproj = 0
@@ -895,6 +896,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
                         # break
                 # if iproj >= self.max_features:
                     # break
+        feature_sets_before = 0
         for i_feature in range(self.n_feature_sets):
             size_of_feature_set = self.feature_set_ends[i_feature] - feature_set_begin
             # get the max-features for this feature-set
@@ -903,8 +905,10 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
             for ifeat in range(max_features * size_of_feature_set):
                 # print("max_features * size_of_feature_set =", max_features * size_of_feature_set)
                 # print("feature_set_begin =", feature_set_begin)
-                self.multi_indices_to_sample[i_feature].push_back(ifeat + feature_set_begin) 
+                self.multi_indices_to_sample[i_feature].push_back(ifeat + feature_sets_before) 
             feature_set_begin = self.feature_set_ends[i_feature]
+            feature_sets_before = feature_set_begin * max_features
+
         return 0
 
     cdef void sample_proj_mat(
@@ -944,52 +948,47 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         if self.uniform_sampling:
             # 01: This algorithm samples features from each feature set uniformly and combines them
             # into one sparse projection vector.
-            while ifeature < n_non_zeros:
-                for idx in range(self.n_feature_sets):
-                    feature_set_end = self.feature_set_ends[idx]
-                    # n_features_in_set is not right for the first set
-                    n_features_in_set = feature_set_end - feature_set_begin
-                    indices_to_sample = self.multi_indices_to_sample[idx]
-                    grid_size = indices_to_sample.size()
-                    # with gil:
-                        # print("feature_set_end = ", feature_set_end)
-                        # print("n_features_in_set = ", n_features_in_set)
-                        # print("grid_size =", grid_size)
+            # for idx in range(self.n_feature_sets):
+            # feature_set_end = self.feature_set_ends[idx]
+            # n_features_in_set is not right for the first set
+            # n_features_in_set = feature_set_end - feature_set_begin
+            for idx in range(self.n_feature_sets):
+                for i in self.multi_indices_to_sample[idx]:
+                    indices_to_sample.push_back(i)
+            grid_size = indices_to_sample.size()
+            # with gil:
+                # print("feature_set_end = ", feature_set_end)
+                # print("n_features_in_set = ", n_features_in_set)
+                # print("grid_size =", grid_size)
+                # print("size of proj_mat_indices = ", proj_mat_indices.size())
 
-                    # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
-                    for i in range(0, grid_size):
-                        j = rand_int(0, grid_size, random_state)
-                        indices_to_sample[j], indices_to_sample[i] = \
-                            indices_to_sample[i], indices_to_sample[j]
+                # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
+            for i in range(0, grid_size):
+                j = rand_int(0, grid_size, random_state)
+                indices_to_sample[j], indices_to_sample[i] = \
+                    indices_to_sample[i], indices_to_sample[j]
+            for i in range(0, n_non_zeros):
+                rand_vec_index = indices_to_sample[i]
 
-                    # sample a n_non_zeros matrix for each feature set, which proceeds by:
-                    # - sample 'n_non_zeros' in a mtry X n_features projection matrix
-                    # - which consists of +/- 1's chosen at a 1/2s rate
-                    # for i in range(0, n_non_zeros_per_set):
-                    # get the next index from the shuffled index array
-                    rand_vec_index = indices_to_sample[0]
+                # get the projection index (i.e. row of the projection matrix) and
+                # feature index (i.e. column of the projection matrix)
+                proj_i = rand_vec_index // n_features
+                feat_i = rand_vec_index % n_features
+                # with gil:
+                    # print("n_non_zeros = ", n_non_zeros,
+                          # "rand_vec_index = ", rand_vec_index,
+                          # "n_features = ", n_features,
+                          # "proj_i = ", proj_i,
+                          # "feat_i = ", feat_i)
 
-                    # get the projection index (i.e. row of the projection matrix) and
-                    # feature index (i.e. column of the projection matrix)
-                    proj_i = rand_vec_index // n_features
-                    feat_i = rand_vec_index % n_features
-                    # with gil:
-                        # print("n_non_zeros = ", n_non_zeros)
-                        # print("rand_vec_index = ", rand_vec_index)
-                        # print("n_features = ", n_features)
-                        # print("proj_i = ", proj_i)
-                        # print("feat_i = ", feat_i)
+                # sample a random weight
+                weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
 
-                    # sample a random weight
-                    weight = 1 if (rand_int(0, 2, random_state) == 1) else -1
+                proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
+                proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
 
-                    proj_mat_indices[proj_i].push_back(feat_i)  # Store index of nonzero
-                    proj_mat_weights[proj_i].push_back(weight)  # Store weight of nonzero
-
-                    # the new beginning is the previous end
-                    feature_set_begin = feature_set_end
-
-                    ifeature += 1
+                # the new beginning is the previous end
+                feature_set_begin = feature_set_end
         else:
             # 02: Algorithm samples feature combinations from each feature set uniformly and evaluates
             # them independently.
@@ -1020,7 +1019,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
                 
                 for i in range(0, n_non_zeros_per_set):
                     # get the next index from the shuffled index array
-                    rand_vec_index = indices_to_sample[i] - feature_set_begin
+                    rand_vec_index = indices_to_sample[i] - feature_set_begin * proj_begin
 
                     # get the projection index (i.e. row of the projection matrix) and
                     # feature index (i.e. column of the projection matrix)

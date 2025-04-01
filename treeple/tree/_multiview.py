@@ -457,6 +457,12 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                     )
 
                 max_features_per_set.append(max_features)
+            ## Use same number of max_feature for each view
+            # n_set = len(max_features_per_set)
+            # # max_features_cross_set = np.max(max_features_per_set)
+            # max_features_cross_set = max_features_per_set[0]
+            # max_features_per_set = np.ones(n_set) * max_features_cross_set
+            # # print(max_features_per_set)
             self.max_features_ = np.sum(max_features_per_set)
             if self.max_features_ > n_features:
                 raise ValueError(
