@@ -436,6 +436,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 if isinstance(max_features, str):
                     if max_features == "sqrt":
                         max_features = max(1, math.ceil(np.sqrt(n_features_in_)))
+                        # max_feature_all = math.ceil(np.sqrt(n_features))
+                        # max_features = math.ceil(max_feature_all * n_features_in_/n_features)
                     elif max_features == "log2":
                         max_features = max(1, math.ceil(np.log2(n_features_in_)))
                 elif max_features is None:
@@ -457,12 +459,13 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                     )
 
                 max_features_per_set.append(max_features)
-            ## Use same number of max_feature for each view
+            # Use same number of max_feature for each view
             # n_set = len(max_features_per_set)
-            # # max_features_cross_set = np.max(max_features_per_set)
+            # max_features_cross_set = np.max(max_features_per_set)
             # max_features_cross_set = max_features_per_set[0]
-            # max_features_per_set = np.ones(n_set) * max_features_cross_set
-            # # print(max_features_per_set)
+            # max_features_per_set_weighted = max_features_per_set
+            # max_features_per_set[0] = 23
+            # print(max_features_per_set)
             self.max_features_ = np.sum(max_features_per_set)
             if self.max_features_ > n_features:
                 raise ValueError(
@@ -505,8 +508,8 @@ class MultiViewDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
                 self.feature_set_ends_,
                 self.n_feature_sets_,
                 self.max_features_per_set_,
-                True,
-                # False
+                # True,
+                False
             )
 
         self.tree_ = ObliqueTree(self.n_features_in_, self.n_classes_, self.n_outputs_)

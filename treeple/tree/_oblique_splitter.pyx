@@ -1134,3 +1134,50 @@ cdef class BestObliqueSplitterTester(BestObliqueSplitter):
             Whether or not a feature has missing values.
         """
         self.init(X, y, sample_weight, missing_values_in_feature_mask)
+
+cdef class MultiViewObliqueSplitterTester(MultiViewObliqueSplitter):
+    """A class to expose a Python interface for testing."""
+
+    cpdef sample_projection_matrix_py(self):
+        """Sample projection matrix using a patch.
+
+        Used for testing purposes.
+
+        Returns projection matrix of shape (max_features, n_features).
+        """
+        cdef vector[vector[float32_t]] proj_mat_weights = vector[vector[float32_t]](self.max_features)
+        cdef vector[vector[intp_t]] proj_mat_indices = vector[vector[intp_t]](self.max_features)
+        cdef intp_t i, j
+
+        # sample projection matrix in C/C++
+        self.sample_proj_mat(proj_mat_weights, proj_mat_indices)
+
+        # convert the projection matrix to something that can be used in Python
+        proj_vecs = np.zeros((self.max_features, self.n_features), dtype=np.float32)
+        for i in range(0, self.max_features):
+            for j in range(0, proj_mat_weights[i].size()):
+                weight = proj_mat_weights[i][j]
+                feat = proj_mat_indices[i][j]
+
+                proj_vecs[i, feat] = weight
+
+        return proj_vecs
+
+    cpdef init_test(self, X, y, sample_weight, missing_values_in_feature_mask=None):
+        """Initializes the state of the splitter.
+
+        Used for testing purposes.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            The input samples.
+        y : array-like, shape (n_samples,)
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like, shape (n_samples,)
+            Sample weights.
+        missing_values_in_feature_mask : array-like, shape (n_features,)
+            Whether or not a feature has missing values.
+        """
+        self.init(X, y, sample_weight, missing_values_in_feature_mask)
