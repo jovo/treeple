@@ -82,7 +82,7 @@ splitter = MultiViewObliqueSplitterTester(
     n_feature_sets,
     max_features_per_set_,
     # False,
-    True
+    True,
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
