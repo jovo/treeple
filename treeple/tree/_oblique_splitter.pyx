@@ -972,7 +972,10 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
 
                 # get the projection index (i.e. row of the projection matrix) and
                 # feature index (i.e. column of the projection matrix)
-                proj_i = rand_vec_index // n_features
+                if i % 2 == 0:
+                    proj_i = rand_vec_index // n_features
+                else:
+                    proj_i = rand_vec_index // n_features + self.max_features_per_set[0]
                 feat_i = rand_vec_index % n_features
                 # with gil:
                     # print("n_non_zeros = ", n_non_zeros,
