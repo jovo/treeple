@@ -48,7 +48,7 @@ missing_value_feature_mask = None
 X = np.repeat(np.arange(feature_set_ends[-1]).astype(np.float32), 8).reshape(8, -1)
 y = np.array([0, 0, 0, 0, 1, 1, 1, 1]).reshape(-1, 1).astype(np.float64)
 
-cmap = ListedColormap(['red', 'white', 'blue'])
+cmap = ListedColormap(["red", "white", "blue"])
 
 
 # %%
@@ -82,7 +82,7 @@ splitter = MultiViewObliqueSplitterTester(
     n_feature_sets,
     max_features_per_set_,
     # False,
-    True
+    True,
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
 
