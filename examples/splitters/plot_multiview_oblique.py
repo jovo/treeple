@@ -48,7 +48,7 @@ missing_value_feature_mask = None
 X = np.repeat(np.arange(feature_set_ends[-1]).astype(np.float32), 8).reshape(8, -1)
 y = np.array([0, 0, 0, 0, 1, 1, 1, 1]).reshape(-1, 1).astype(np.float64)
 
-cmap = ListedColormap(["white", "green"][:n_feature_sets])
+cmap = ListedColormap(['red', 'white', 'blue'])
 
 
 # %%
@@ -81,7 +81,7 @@ splitter = MultiViewObliqueSplitterTester(
     feature_set_ends,
     n_feature_sets,
     max_features_per_set_,
-    # False,
+    # False,$
     True
 )
 splitter.init_test(X, y, sample_weight, missing_value_feature_mask)
@@ -113,9 +113,9 @@ sm = ScalarMappable(cmap=cmap)
 sm.set_array([])  # You can set an empty array or values here
 
 # Create a color bar with labels for each feature set
-colorbar = fig.colorbar(sm, ax=ax, ticks=[0.25, 0.75], format="%d")
+colorbar = fig.colorbar(sm, ax=ax, ticks=[-1, 1], format="%d")
 colorbar.set_label("Projection Weight (I.e. Sampled Feature From a Feature Set)")
-colorbar.ax.set_yticklabels(["0", "1"])
+colorbar.ax.set_yticklabels(["-1", "1"])
 
 plt.show()
 
