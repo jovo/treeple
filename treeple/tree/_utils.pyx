@@ -62,7 +62,7 @@ cdef void floyd_sample_indices(
         Size of the domain to sample from
     random_state : uint32_t*
         The random state.
-    '''
+    """
     cdef unordered_set[intp_t] seen
     cdef intp_t i, r, count = 0
 
