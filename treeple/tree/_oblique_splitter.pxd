@@ -155,6 +155,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
     # whether or not to uniformly sample feature-sets into each projection vector
     # if True, then sample from each feature set for each projection vector
     cdef const intp_t[:] max_features_per_set
+    cdef const float64_t[:] feature_combinations_per_set
     cdef bint uniform_sampling
 
     cdef vector[vector[intp_t]] multi_indices_to_sample

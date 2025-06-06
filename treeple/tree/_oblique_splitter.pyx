@@ -834,12 +834,14 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         const intp_t[:] feature_set_ends,
         intp_t n_feature_sets,
         const intp_t[:] max_features_per_set,
+        const float64_t[:] feature_combinations_per_set,
         bint uniform_sampling,
         *argv
     ):
         self.feature_set_ends = feature_set_ends
         self.uniform_sampling = uniform_sampling
         self.max_features_per_set = max_features_per_set
+        self.feature_combinations_per_set = feature_combinations_per_set
 
         # infer the number of feature sets
         self.n_feature_sets = n_feature_sets
@@ -859,6 +861,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
                     self.n_feature_sets,
                     self.uniform_sampling,
                     self.max_features_per_set,
+                    self.feature_combinations_per_set,
                 ), self.__getstate__())
 
     cdef int init(
@@ -922,7 +925,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
         but now also uniformly samples features from each feature set.
         """
         cdef intp_t n_features = self.n_features
-        cdef float64_t feature_combinations = self.feature_combinations
+        # cdef float64_t[:] feature_combinations = self.feature_combinations_per_set
         cdef intp_t n_non_zeros = self.n_non_zeros
         cdef uint32_t* random_state = &self.rand_r_state
 
@@ -1002,12 +1005,19 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
             for idx in range(self.n_feature_sets):
                 feature_set_end = self.feature_set_ends[idx]
                 n_features_in_set = feature_set_end - feature_set_begin
-                n_non_zeros_per_set = max(<intp_t>(self.max_features_per_set[idx] * feature_combinations), 1)
+                n_non_zeros_per_set = max(<intp_t>(self.max_features_per_set[idx] * self.feature_combinations_per_set[idx]), 1)
 
                 # indices to sample is a 1D-index array of size (max_features * n_features_in_set)
                 # which is Fisher-Yates shuffled to sample random features in each feature set
                 indices_to_sample = self.multi_indices_to_sample[idx]
                 grid_size = indices_to_sample.size()
+
+                # with gil:
+                    # print("n_features",n_features,"n_non_zeros = ", n_non_zeros,
+                    # "n_features_in_set",n_features_in_set, "grid_size",grid_size,
+                    # "n_non_zeros_per_set = ", n_non_zeros_per_set,
+                    # "feature_combinations_per_set = ", self.feature_combinations_per_set[idx],
+                    # "max_features_per_set = ", self.max_features_per_set[idx])
 
                 # shuffle indices over the 2D grid for this feature set to sample using Fisher-Yates
                 for i in range(0, grid_size):
@@ -1018,6 +1028,7 @@ cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
                     # print("n_features",n_features,"n_non_zeros = ", n_non_zeros,
                     # "n_features_in_set",n_features_in_set, "grid_size",grid_size,
                     # "n_non_zeros_per_set = ", n_non_zeros_per_set,
+                    # "feature_combinations_per_set = ", self.feature_combinations_per_set[idx],
                     # "max_features_per_set = ", self.max_features_per_set[idx])
                 
                 for i in range(0, n_non_zeros_per_set):
