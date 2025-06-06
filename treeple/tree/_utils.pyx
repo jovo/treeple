@@ -43,7 +43,7 @@ cdef inline void fisher_yates_shuffle(
             indices_to_sample[i], indices_to_sample[j]
 
 
-cdef void floyd_sample_indices(
+cdef inline void floyd_sample_indices(
     intp_t[::1] out,
     intp_t k,
     intp_t n,
