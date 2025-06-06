@@ -821,6 +821,7 @@ cdef class MultiViewSplitter(BestObliqueSplitter):
                         break
 
 # Test version now
+# Introduce `feature_combinations_per_set` to specify custom feature combinations for each set.
 cdef class MultiViewObliqueSplitter(BestObliqueSplitter):
     def __cinit__(
         self,
