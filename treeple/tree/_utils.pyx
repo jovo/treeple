@@ -49,7 +49,7 @@ cdef void floyd_sample_indices(
     intp_t n,
     uint32_t* random_state
 ) noexcept nogil:
-    '''
+    """
     Rober Floyd's algorithm for sampling without replacement
 
     Parameters
