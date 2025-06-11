@@ -64,17 +64,16 @@ cdef inline void floyd_sample_indices(
         The random state.
     """
     cdef unordered_set[intp_t] seen
-    cdef intp_t i, r, count = 0
+    cdef intp_t i, r = 0
 
     for i in range(n - k, n):
         r = rand_int(0, i + 1, random_state)
         if seen.find(r) == seen.end():
             seen.insert(r)
-            out[count] = r
+            out[i - n + k] = r
         else:
             seen.insert(i)
-            out[count] = i
-        count += 1
+            out[i - n + k] = i
 
 
 cdef inline int rand_weighted_binary(
