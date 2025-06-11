@@ -183,7 +183,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # or max w/ 1...
         self.n_non_zeros = max(<intp_t>(self.max_features * self.feature_combinations), 1)
 
-
     cdef int init(
         self,
         object X,
@@ -237,7 +236,6 @@ cdef class ObliqueSplitter(BaseObliqueSplitter):
         # construct an array to sample from mTry x n_features set of indices
         cdef intp_t[::1] indices_to_sample = self.indices_to_sample
         cdef intp_t grid_size = self.max_features * self.n_features
-
 
         # draw n_non_zeros random indices from the mTry x n_features set of indices
         floyd_sample_indices(indices_to_sample, n_non_zeros, grid_size, random_state)

@@ -23,9 +23,9 @@ cdef void fisher_yates_shuffle(
 
 
 cdef void floyd_sample_indices(
-    intp_t[::1] out, 
-    intp_t k, 
-    intp_t n, 
+    intp_t[::1] out,
+    intp_t k,
+    intp_t n,
     uint32_t* random_state
 ) noexcept nogil
 
