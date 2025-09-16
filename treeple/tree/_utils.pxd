@@ -21,6 +21,12 @@ cdef void fisher_yates_shuffle(
     uint32_t* random_state,
 ) noexcept nogil
 
+cdef void floyd_sample_indices(
+    intp_t[::1] out,
+    intp_t k,
+    intp_t n,
+    uint32_t* random_state
+) noexcept nogil
 
 cdef int rand_weighted_binary(
     float64_t p0,
