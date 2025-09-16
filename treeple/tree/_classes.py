@@ -1000,6 +1000,13 @@ class ObliqueDecisionTreeClassifier(SimMatrixMixin, DecisionTreeClassifier):
 
         builder.build(self.tree_, X, y, sample_weight, None)
 
+        if self.splitter == "best":
+            self.root_projection_matrix_ = splitter.get_root_projection_matrix()
+            self.first_best_split_ = splitter.get_first_best_split()
+        else:
+            self.root_projection_matrix_ = None
+            self.first_best_split_ = None
+
         if self.n_outputs_ == 1:
             self.n_classes_ = self.n_classes_[0]
             self.classes_ = self.classes_[0]
