@@ -484,7 +484,10 @@ class CascadeStreamForest(RandomForestClassifier):
         # Update existing stream decision trees
         trees = Parallel(n_jobs=self.n_jobs)(
             delayed(_partial_fit)(
-                tree, X, y, n_samples_bootstrap=n_samples_bootstrap,
+                tree,
+                X,
+                y,
+                n_samples_bootstrap=n_samples_bootstrap,
                 classes=self.classes_,
             )
             for tree in self.estimators_
@@ -510,7 +513,10 @@ class CascadeStreamForest(RandomForestClassifier):
                 store_leaf_values=self.store_leaf_values,
             )
             _partial_fit(
-                sdt, X, y, n_samples_bootstrap=n_samples_bootstrap,
+                sdt,
+                X,
+                y,
+                n_samples_bootstrap=n_samples_bootstrap,
                 classes=self.classes_,
             )
             self.estimators_.append(sdt)

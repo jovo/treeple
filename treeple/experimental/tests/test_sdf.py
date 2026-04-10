@@ -168,9 +168,7 @@ def test_csf_iris(criterion, max_features):
     assert len(clf.estimators_) == 3, "Should grow to 3 trees"
 
     score = accuracy_score(clf.predict(iris.data), iris.target)
-    assert score > 0.5 and score <= 1.0, (
-        f"Failed with CSF, criterion={criterion}, score={score}"
-    )
+    assert score > 0.5 and score <= 1.0, f"Failed with CSF, criterion={criterion}, score={score}"
 
 
 def test_csf_max_estimators():
@@ -183,9 +181,7 @@ def test_csf_max_estimators():
     for i in range(5):
         clf.partial_fit(X, y, classes=classes if i == 0 else None)
 
-    assert len(clf.estimators_) == 3, (
-        f"Should cap at n_estimators=3, got {len(clf.estimators_)}"
-    )
+    assert len(clf.estimators_) == 3, f"Should cap at n_estimators=3, got {len(clf.estimators_)}"
 
 
 @parametrize_with_checks([CascadeStreamForest(n_estimators=10, random_state=0)])
