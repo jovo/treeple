@@ -231,7 +231,7 @@ class StreamDecisionForest(RandomForestClassifier):
                 delayed(_partial_fit)(
                     DecisionTreeClassifier(
                         criterion=self.criterion,
-                        splitter="best",
+                        splitter=self.splitter,
                         max_depth=self.max_depth,
                         min_samples_split=self.min_samples_split,
                         min_samples_leaf=self.min_samples_leaf,
